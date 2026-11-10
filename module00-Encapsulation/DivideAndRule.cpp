@@ -10,17 +10,7 @@ class Bank
     size_t new_id;
 	Accounts clientAccounts;
 
-	Bank() :
-		liquidity(0)
-	{
-
-	}
-    ~Bank() {
-        for (size_t i=0; i<clientAccounts.size(); i++)
-        delete clientAccounts[i];
-    }
-
-    Accounts::iterator findOrThrow(size_t id)
+    Accounts::iterator getAccount(size_t id)
     {
         Accounts::iterator it = clientAccounts.find(id);
         if (it == clientAccounts.end())
@@ -28,7 +18,7 @@ class Bank
         return it;
     }
 
-    Accounts::const_iterator findOrThrow(size_t id) const
+    Accounts::const_iterator getAccount(size_t id) const
     {
         Accounts::const_iterator it = clientAccounts.find(id);
         if (it == clientAccounts.end())
@@ -36,22 +26,38 @@ class Bank
         return it;
     }
 
-    const Account& operator [] (size_t id) const 
+    Bank(const Bank&);
+    Bank& operator=(const Bank&);
+
+    const Account& operator [] (size_t id) const
     {
-        return *(findOrThrow(id)->second);
+        return *(getAccount(id)->second);
     }
 
     friend std::ostream& operator << (std::ostream& p_os, const Bank& p_bank)
     {
     	p_os << "Bank informations : " << std::endl;
     	p_os << "Liquidity : " << p_bank.liquidity << std::endl;
-        for (size_t i=0; i<p_bank.clientAccounts.size(); i++) {
-            p_os << p_bank[i] << std::endl;
-        }
+        for (Accounts::const_iterator it=p_bank.clientAccounts.begin(); it!=p_bank.clientAccounts.end();it++)
+            p_os << *(it->second) << std::endl;
+
     	return (p_os);
     }
 
 public:
+	Bank() :
+		liquidity(200),
+        new_id(0)
+	{
+
+	}
+
+    ~Bank()
+    {
+        for (Accounts::iterator it=clientAccounts.begin(); it!=clientAccounts.end();it++)
+            delete it->second;
+    }
+
     void createAccount(int value)
     {
         clientAccounts[new_id] = new Account(new_id, value);
@@ -60,20 +66,20 @@ public:
 
     void deleteAccount(size_t id)
     {
-        Accounts::iterator it = findOrThrow(id);
+        Accounts::iterator it = getAccount(id);
         delete it->second;
         clientAccounts.erase(it);
     }
 
     void deposit(size_t id, int value)
     {
-        Accounts::iterator it = findOrThrow(id);
+        Accounts::iterator it = getAccount(id);
         it->second->value += value;
     }
 
     void withdraw(size_t id, int value)
     {
-        Accounts::iterator it = findOrThrow(id);
+        Accounts::iterator it = getAccount(id);
         it->second->value -= value;
     }
 
@@ -103,12 +109,10 @@ private:
 
 int main()
 {
-	Bank bank = Bank();
+	Bank bank;
 
      bank.createAccount(100);
      bank.createAccount(100);
-
-     bank.liquidity -= 200;
 
      bank.deposit(0, 400);
 
