@@ -4,8 +4,77 @@
 
 class Bank
 {
-    class Account; //class定義の先頭にAccountがあるとコードの可読性が下がる気がするので前方宣言でしたに書いているが、ここはどうなるべきなんだろう。hppを書いてBankとAccountのファイルを分けてよみやすくするのがいいのかな
+public:
+	Bank() :
+		liquidity(200),
+        new_id(0)
+	{
+
+	}
+
+    ~Bank()
+    {
+        for (Accounts::iterator it=clientAccounts.begin(); it!=clientAccounts.end();it++)
+            delete it->second;
+    }
+
+    size_t createAccount()
+    {
+        size_t id = new_id++;
+        clientAccounts[id] = new Account(id);
+        
+        return id;
+    }
+
+    void deleteAccount(size_t id)
+    {
+        Accounts::iterator it = getAccount(id);
+        delete it->second;
+        clientAccounts.erase(it);
+    }
+
+    void deposit(size_t id, int value)
+    {
+        if (value <= 0)
+            throw std::invalid_argument("deposit amount must be positive");
+
+        Accounts::iterator it = getAccount(id); //to validate to not founded account
+        int truncated_deposit_fee = value * DEPOSIT_FEE_PERCENT / 100;
+        if (truncated_deposit_fee <= 0)
+            throw DepositTooSmall();
+
+        liquidity += truncated_deposit_fee;
+        it->second->value += value - truncated_deposit_fee;
+    }
+
+    void withdraw(size_t id, int value)
+    {
+        if (value <= 0)
+            throw std::invalid_argument("withdrawal amount must be positive");
+
+        Accounts::iterator it = getAccount(id);
+        if (it->second->value < value)
+            throw InsufficientFunds();
+
+        it->second->value -= value;
+    }
+
+    class DepositTooSmall : public std::runtime_error
+    {
+    public:
+        DepositTooSmall() : std::runtime_error("deposit is too small to charge a fee") {}
+    };
+
+    class InsufficientFunds : public std::runtime_error
+    {
+    public:
+        InsufficientFunds() : std::runtime_error( "withdrawal amount exceeds account balance") {}
+    };
+
+private:
+    class Account;
     typedef std::map<size_t, Account *> Accounts;
+    static const int DEPOSIT_FEE_PERCENT = 5;
 	int liquidity;
     size_t new_id;
 	Accounts clientAccounts;
@@ -43,61 +112,15 @@ class Bank
 
     	return (p_os);
     }
-
-public:
-	Bank() :
-		liquidity(200),
-        new_id(0)
-	{
-
-	}
-
-    ~Bank()
-    {
-        for (Accounts::iterator it=clientAccounts.begin(); it!=clientAccounts.end();it++)
-            delete it->second;
-    }
-
-    void createAccount(int value)
-    {
-        clientAccounts[new_id] = new Account(new_id, value);
-        new_id++;
-    }
-
-    void deleteAccount(size_t id)
-    {
-        Accounts::iterator it = getAccount(id);
-        delete it->second;
-        clientAccounts.erase(it);
-    }
-
-    void deposit(size_t id, int value)
-    {
-        Accounts::iterator it = getAccount(id);
-        it->second->value += value;
-    }
-
-    void withdraw(size_t id, int value)
-    {
-        Accounts::iterator it = getAccount(id);
-        it->second->value -= value;
-    }
-
-private:
+    
     class Account
     {
         friend class Bank;
     
-    	size_t id;
+    	const size_t id;
     	int value;
     
-    
-    	Account(size_t id, int value) :
-    		id(id),
-    		value(value)
-    	{
-    	
-    	}
+    	Account(size_t id) : id(id), value(0) {}
     
     	friend std::ostream& operator << (std::ostream& p_os, const Account& p_account)
     	{
@@ -111,11 +134,10 @@ int main()
 {
 	Bank bank;
 
-     bank.createAccount(100);
-     bank.createAccount(100);
+    bank.createAccount(100);
+    bank.createAccount(100);
 
-     bank.deposit(0, 400);
-
+    bank.deposit(0, 400);
 
 	std::cout << " ----- " << std::endl;
 
