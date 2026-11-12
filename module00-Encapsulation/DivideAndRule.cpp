@@ -1,9 +1,12 @@
 #include <iostream>
 #include <map>
 #include <stdexcept>
+#include <climits>
 
 class Bank
 {
+private:
+    class Account;
 public:
 	Bank() :
 		liquidity(200),
@@ -33,18 +36,24 @@ public:
         clientAccounts.erase(it);
     }
 
-    void deposit(size_t id, int value)
+    void deposit(size_t id, int amount)
     {
-        if (value <= 0)
+        if (amount <= 0)
             throw std::invalid_argument("deposit amount must be positive");
 
         Accounts::iterator it = getAccount(id); //to validate to not founded account
-        int truncated_deposit_fee = value * DEPOSIT_FEE_PERCENT / 100;
-        if (truncated_deposit_fee <= 0)
-            throw DepositTooSmall();
+        int fee = amount / DEPOSIT_FEE_DIVISOR;
+        int credited = amount - fee;
 
-        liquidity += truncated_deposit_fee;
-        it->second->value += value - truncated_deposit_fee;
+        if (fee <= 0)
+            throw DepositTooSmall();
+        if (fee > INT_MAX - liquidity)
+            throw std::overflow_error("deposit exceeds the bank's liquidity capacity");
+        if (credited > INT_MAX - it->second->value)
+            throw std::overflow_error("deposit exceeds the account's balance capacity");
+
+        liquidity += fee;
+        it->second->value += credited;
     }
 
     void withdraw(size_t id, int value)
@@ -59,6 +68,21 @@ public:
         it->second->value -= value;
     }
 
+    const Account& operator [] (size_t id) const
+    {
+        return *(getAccount(id)->second);
+    }
+
+    friend std::ostream& operator << (std::ostream& p_os, const Bank& p_bank)
+    {
+    	p_os << "Bank informations : " << std::endl;
+    	p_os << "Liquidity : " << p_bank.liquidity << std::endl;
+        for (Accounts::const_iterator it=p_bank.clientAccounts.begin(); it!=p_bank.clientAccounts.end();it++)
+            p_os << *(it->second) << std::endl;
+
+    	return (p_os);
+    }
+    
     class DepositTooSmall : public std::runtime_error
     {
     public:
@@ -72,9 +96,8 @@ public:
     };
 
 private:
-    class Account;
     typedef std::map<size_t, Account *> Accounts;
-    static const int DEPOSIT_FEE_PERCENT = 5;
+    static const int DEPOSIT_FEE_DIVISOR = 20; // 5% = 1/20
 	int liquidity;
     size_t new_id;
 	Accounts clientAccounts;
@@ -98,21 +121,6 @@ private:
     Bank(const Bank&);
     Bank& operator=(const Bank&);
 
-    const Account& operator [] (size_t id) const
-    {
-        return *(getAccount(id)->second);
-    }
-
-    friend std::ostream& operator << (std::ostream& p_os, const Bank& p_bank)
-    {
-    	p_os << "Bank informations : " << std::endl;
-    	p_os << "Liquidity : " << p_bank.liquidity << std::endl;
-        for (Accounts::const_iterator it=p_bank.clientAccounts.begin(); it!=p_bank.clientAccounts.end();it++)
-            p_os << *(it->second) << std::endl;
-
-    	return (p_os);
-    }
-    
     class Account
     {
         friend class Bank;
