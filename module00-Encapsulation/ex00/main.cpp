@@ -3,17 +3,13 @@
 
 int main()
 {
-	Bank bank;
-
-    bank.createAccount(100);
-    bank.createAccount(100);
-
-    bank.deposit(0, 400);
-
-	std::cout << " ----- " << std::endl;
-
-	std::cout << "Bank : " << std::endl;
-	std::cout << bank << std::endl;
+    //TODO: demo
+    try {
+        Bank_test::runBankTests();
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return(1);
+    }
 
 	return (0);
 }

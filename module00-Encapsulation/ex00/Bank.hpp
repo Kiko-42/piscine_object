@@ -19,6 +19,11 @@ public:
         Account(size_t id) : id(id), value(0), loan(0) {}
     
         friend std::ostream& operator << (std::ostream& p_os, const Account& p_account);
+
+    public:
+        size_t getId() const { return id; }
+        int getValue() const { return value; }
+        int getLoan() const { return loan; }
     };
     
     Bank();
@@ -30,7 +35,9 @@ public:
     void withdraw(size_t id, int amount);
     void loan(size_t id, int amount);
     void repay(size_t id, int amount);
-    
+
+    int getLiquidity() const { return liquidity; }
+
     const Account& operator [] (size_t id) const;
     friend std::ostream& operator << (std::ostream& p_os, const Bank& p_bank);
     

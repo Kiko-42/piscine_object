@@ -94,18 +94,20 @@ void Bank::loan(size_t id, int amount)
     if (amount > liquidity)
         throw InsufficientLiquidity();
     int fee = amount / FEE_DIVISOR;
-    int credited = amount - fee;
+    int payout = amount - fee;
+    int debt = amount;
 
     if (fee <= 0)
         throw LoanTooSmall();
-    if (credited > INT_MAX - it->second->value)
+    if (payout > INT_MAX - it->second->value)
         throw std::overflow_error("loan exceeds the account's balance capacity");
     if (amount > INT_MAX - it->second->loan)
         throw std::overflow_error("loan exceeds the account's loan capacity");
 
-    liquidity -= credited;
-    it->second->value += credited;
-    it->second->loan += amount;
+    // The fee is withheld from the payout, not added to the debt: the client receives amount - fee but owes the full amount, so the bank earns the fee once the loan is repaid.
+    liquidity -= payout;
+    it->second->value += payout;
+    it->second->loan += debt;
 }
 
 void Bank::repay(size_t id, int amount)
