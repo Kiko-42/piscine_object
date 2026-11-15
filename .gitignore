@@ -1,3 +1,7 @@
+.gitignore
 *pdf*
 module00-Encapsulation/dr
 module00-Encapsulation/a.out
+*.d
+*.o
+*bank

@@ -11,8 +11,11 @@ private:
 
     static void expectEqual(const char *label, int expect, int actual);
 
+    static void testCreateAccount();
+    static void testDeleteAccount();
     static void testDeposit();
     static void testLoan();
+    static void testWithdrawInsufficientFunds();
 };
 
 #endif
