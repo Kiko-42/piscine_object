@@ -13,16 +13,16 @@ public:
         friend class Bank;
     
         const size_t id;
-        int value;
+        int balance;
         int loan;
     
-        Account(size_t id) : id(id), value(0), loan(0) {}
+        Account(size_t id) : id(id), balance(0), loan(0) {}
     
         friend std::ostream& operator << (std::ostream& p_os, const Account& p_account);
 
     public:
         const size_t& getId() const { return id; }
-        const int& getValue() const { return value; }
+        const int& getBalance() const { return balance; }
         const int& getLoan() const { return loan; }
     };
     
@@ -64,7 +64,11 @@ public:
     public:
         InsufficientLiquidity() : std::runtime_error( "bank liquidity is insufficient for this loan") {}
     };
-
+    class RepaymentExceedsLoan: public std::runtime_error
+    {
+    public:
+        RepaymentExceedsLoan() : std::runtime_error("repayment is bigger than the loan") {}
+    };
 private:
     typedef std::map<size_t, Account *> Accounts;
     static const int FEE_DIVISOR = 20; // 5% = 1/20

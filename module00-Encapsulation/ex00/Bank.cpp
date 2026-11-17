@@ -29,7 +29,7 @@ std::ostream& operator << (std::ostream& p_os, const Bank& p_bank)
 
 std::ostream& operator << (std::ostream& p_os, const Bank::Account& p_account)
 {
-    p_os << "id: [" << p_account.id << "] - balance: [" << p_account.value << "] - loan: [" << p_account.loan << "]";
+    p_os << "id: [" << p_account.id << "] - balance: [" << p_account.balance << "] - loan: [" << p_account.loan << "]";
     return (p_os);
 }
 
@@ -66,11 +66,11 @@ void Bank::deposit(size_t id, int amount)
         throw DepositTooSmall();
     if (fee > INT_MAX - liquidity)
         throw std::overflow_error("deposit exceeds the bank's liquidity capacity");
-    if (credited > INT_MAX - it->second->value)
+    if (credited > INT_MAX - it->second->balance)
         throw std::overflow_error("deposit exceeds the account's balance capacity");
 
     liquidity += fee;
-    it->second->value += credited;
+    it->second->balance += credited;
 }
 
 void Bank::withdraw(size_t id, int amount)
@@ -79,10 +79,10 @@ void Bank::withdraw(size_t id, int amount)
         throw std::invalid_argument("withdrawal amount must be positive");
 
     Accounts::iterator it = getAccount(id);
-    if (it->second->value < amount)
+    if (it->second->balance < amount)
         throw InsufficientFunds();
 
-    it->second->value -= amount;
+    it->second->balance -= amount;
 }
 
 void Bank::loan(size_t id, int amount)
@@ -99,14 +99,14 @@ void Bank::loan(size_t id, int amount)
 
     if (fee <= 0)
         throw LoanTooSmall();
-    if (payout > INT_MAX - it->second->value)
+    if (payout > INT_MAX - it->second->balance)
         throw std::overflow_error("loan exceeds the account's balance capacity");
     if (amount > INT_MAX - it->second->loan)
         throw std::overflow_error("loan exceeds the account's loan capacity");
 
     // The fee is withheld from the payout, not added to the debt: the client receives amount - fee but owes the full amount, so the bank earns the fee once the loan is repaid.
     liquidity -= payout;
-    it->second->value += payout;
+    it->second->balance += payout;
     it->second->loan += debt;
 }
 
@@ -117,15 +117,15 @@ void Bank::repay(size_t id, int amount)
 
     Accounts::iterator it = getAccount(id);
     if (amount > it->second->loan)
-        throw std::invalid_argument("repayment amount is bigger than loan");
-    if (amount > it->second->value)
+        throw RepaymentExceedsLoan();
+    if (amount > it->second->balance)
         throw InsufficientFunds();
     if (amount > INT_MAX - liquidity)
         throw std::overflow_error("repayment exceeds the bank's liquidity capacity");
 
     liquidity += amount;
     it->second->loan -= amount;
-    it->second->value -= amount;
+    it->second->balance -= amount;
 }
 
 Bank::Accounts::iterator Bank::getAccount(size_t id)
