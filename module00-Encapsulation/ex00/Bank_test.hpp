@@ -17,6 +17,7 @@ private:
 
     static void testCreateAccount();
     static void testDeleteAccount();
+    static void testDeleteAccountOutstandingLoan();
     static void testDeposit();
     static void testDepositZero();
     static void testDepositNegative();

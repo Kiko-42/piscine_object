@@ -17,6 +17,7 @@ public:
         int loan;
     
         Account(size_t id) : id(id), balance(0), loan(0) {}
+        Account(const Account&);
     
         friend std::ostream& operator << (std::ostream& p_os, const Account& p_account);
 
@@ -68,6 +69,11 @@ public:
     {
     public:
         RepaymentExceedsLoan() : std::runtime_error("repayment is bigger than the loan") {}
+    };
+    class OutstandingLoan: public std::runtime_error
+    {
+    public:
+        OutstandingLoan() : std::runtime_error("account has an outstanding loan") {}
     };
 private:
     typedef std::map<size_t, Account *> Accounts;

@@ -7,6 +7,7 @@ void Bank_test::runBankTests()
 {
     testCreateAccount();
     testDeleteAccount();
+    testDeleteAccountOutstandingLoan();
     testDeposit();
     testDepositZero();
     testDepositNegative();
@@ -73,6 +74,25 @@ void Bank_test::testDeleteAccount()
         return;
     }
     throw std::runtime_error("deleteAccount: account is still accessible after delete");
+}
+
+void Bank_test::testDeleteAccountOutstandingLoan()
+{
+    Bank bank;
+    size_t id = bank.createAccount();
+    size_t depositor = bank.createAccount();
+
+    bank.deposit(depositor, 40000);
+
+    bank.loan(id, 2000);
+
+    try {
+        bank.deleteAccount(id);
+    } catch (const Bank::OutstandingLoan&) {
+        expectState("delete with loan: state unchanged", bank, id, 1900, 2000, 100);
+        return;
+    }
+    throw std::runtime_error("deleteAccount: expected OutstandingLoan");
 }
 
 void Bank_test::testDeposit()

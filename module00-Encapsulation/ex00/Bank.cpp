@@ -49,6 +49,8 @@ size_t Bank::createAccount()
 void Bank::deleteAccount(size_t id)
 {
     Accounts::iterator it = getAccount(id);
+    if (it->second->loan > 0)
+        throw OutstandingLoan();
     delete it->second;
     clientAccounts.erase(it);
 }
@@ -91,14 +93,14 @@ void Bank::loan(size_t id, int amount)
         throw std::invalid_argument("loan amount must be positive");
 
     Accounts::iterator it = getAccount(id);
-    if (amount > liquidity)
-        throw InsufficientLiquidity();
     int fee = amount / FEE_DIVISOR;
     int payout = amount - fee;
     int debt = amount;
 
     if (fee <= 0)
         throw LoanTooSmall();
+    if (payout > liquidity)
+        throw InsufficientLiquidity();
     if (payout > INT_MAX - it->second->balance)
         throw std::overflow_error("loan exceeds the account's balance capacity");
     if (amount > INT_MAX - it->second->loan)
