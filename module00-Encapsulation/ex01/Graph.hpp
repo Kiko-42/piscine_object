@@ -7,12 +7,12 @@
 class Graph
 {
 public:
-    Graph(Vector2 size);
-    void addPoint(Vector2);
+    Graph(const Vector2& size);
+    void addPoint(Vector2& point);
     void print() const;
 private:
+    static const int MAX_SIZE = 10;
     Graph(const Graph&);
-    Graph& operator=(const Graph&);
     const Vector2 size;
     std::vector<Vector2> points;
 };
