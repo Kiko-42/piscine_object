@@ -7,13 +7,16 @@
 class Graph
 {
 public:
+    typedef std::vector<Vector2> Points;
+
+    static const int MAX_SIZE = 10;
+
     Graph(const Vector2& size);
-    void addPoint(Vector2& point);
+    void addPoint(const Vector2& point);
     void print() const;
 private:
-    static const int MAX_SIZE = 10;
     Graph(const Graph&);
     const Vector2 size;
-    std::vector<Vector2> points;
+    Points points;
 };
 #endif

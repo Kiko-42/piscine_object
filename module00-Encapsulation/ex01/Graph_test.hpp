@@ -12,5 +12,8 @@ private:
     static void testGraphSizeNaN();
     static void testGraphSizeOverMax();
     static void testAddPoint();
+    static void testAddPointOutOfRangeNegative();
+    static void testAddPointNaN();
+    static void testAddPointOutOfRangeMaxSize();
 };
 #endif

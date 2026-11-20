@@ -1,28 +1,51 @@
 #include "Graph.hpp"
+#include <cmath>
+#include <iostream>
+#include <sstream>
 #include <stdexcept>
 
-Graph::Graph(const Vector2& size) :size(size) 
+Graph::Graph(const Vector2& size) :size(size)
 {
-    if (!(size.x > 0 && size.x <= MAX_SIZE && size.y > 0 && size.y <= MAX_SIZE))
+    if (!(size.x <= MAX_SIZE && size.x > 0 && size.y <= MAX_SIZE && size.y > 0))
     {
-        throw std::invalid_argument("");
+        throw std::invalid_argument(""); //OutOfRange?
     }
 }
-
-void Graph::addPoint(Vector2& point)
+void Graph::addPoint(const Vector2& point)
 {
-    if (!(point.x >= 0 && point.x <= MAX_SIZE - 1 && point.y >= 0 && point.y <= MAX_SIZE - 1))
+    if (!(0 <= point.x && point.x < MAX_SIZE && 0 <= point.y && point.y < MAX_SIZE))
     {
-        throw std::out_of_range("");
+        throw std::out_of_range(""); //OutOfRange?
     }
     points.push_back(point);
 }
 
 void Graph::print() const
 {
-    // MAX_SIZEのboolの2次元配列paperを作る : O(N^2)
-    // for文でpointsを1つ1つ探索し四捨五入しつつ、paper[y][x]にtrueを置く : O(N)
-
-    // paperを1つ1つ見ていき、osstreamに追加する : O(N)
-    // 出力する
+    int width  = static_cast<int>(std::floor(size.x + 0.5f));
+    int height = static_cast<int>(std::floor(size.y + 0.5f));
+    std::vector<std::vector<bool> > paper(height, std::vector<bool>(width, false));
+    //lookpu points and store 四捨五入した値
+    for (Points::const_iterator it=points.begin();it!=points.end();it++)
+    {
+        int x = std::floor(it->x);
+        int y = std::floor(it->y);
+        paper[y][x] = true;
+    }
+    // output each y line
+    for (int y=size.y-1;y>=0;y--)
+    {
+        std::ostringstream oss;
+        for (int x=0;x<size.x;x++)
+        {
+            if (paper[y][x])
+            {
+                oss << "X";
+                continue;
+            }
+            oss << ".";
+         }
+         std::cout << oss.str() << std::endl;
+    }
 }
+
