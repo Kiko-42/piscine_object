@@ -15,5 +15,7 @@ private:
     static void testAddPointOutOfRangeNegative();
     static void testAddPointNaN();
     static void testAddPointOutOfRangeMaxSize();
+    static void testPrintFractionalSize();
+
 };
 #endif
