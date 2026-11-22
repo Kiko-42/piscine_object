@@ -1,6 +1,7 @@
 NAME     = graph
 CXX      = c++
 CXXFLAGS = -Wall -Wextra -Werror -MMD -MP
+# CXXFLAGS += -Wconversion
 
 SRCS = main.cpp Graph.cpp Vector2.cpp Graph_test.cpp
 OBJS = $(SRCS:.cpp=.o)

@@ -7,11 +7,14 @@ int main()
 {
     // Demo
     try {
-        Graph g(Vector2(10,10));
-        g.addPoint(Vector2(1,1));
+        Graph g(Vector2(5, 5));
+        g.addPoint(Vector2(0, 0));
+        g.addPoint(Vector2(2, 2));
+        g.addPoint(Vector2(4, 2));
+        g.addPoint(Vector2(2, 4));
         g.print();
     } catch (const std::exception& e) {
-        std::cout << "Demo Error: " << e.what() << std::endl;
+        std::cout << e.what() << std::endl;
     }
 
     //Test Runner

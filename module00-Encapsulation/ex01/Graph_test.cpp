@@ -53,7 +53,7 @@ static void expectInvalidAddPoint(float x, float y)
 
 void Graph_test::testGraphSize()
 {
-    Graph d(Vector2(0.4, 0.4));
+    Graph d(Vector2(0.4f, 0.4f));
     Graph a(Vector2(1, 1));
     Graph c(Vector2(Graph::MAX_SIZE, Graph::MAX_SIZE));
 }
@@ -88,6 +88,8 @@ void Graph_test::testGraphSizeOverMax()
     expectInvalidSize(inf, 1);
     expectInvalidSize(1, inf);
     expectInvalidSize(inf, inf);
+
+    expectInvalidSize(Graph::MAX_SIZE + 0.5f, 1);
 }
 
 void Graph_test::testAddPoint()
@@ -95,7 +97,7 @@ void Graph_test::testAddPoint()
     expectValidAddPoint(0, 0);
     expectValidAddPoint(0.5f, 0.5f);
     expectValidAddPoint(1, 1);
-    expectValidAddPoint(Graph::MAX_SIZE-1, Graph::MAX_SIZE-1);
+    expectValidAddPoint(Graph::MAX_SIZE, Graph::MAX_SIZE);
 }
 
 void Graph_test::testAddPointOutOfRangeNegative()
@@ -117,10 +119,11 @@ void Graph_test::testAddPointNaN()
 void Graph_test::testAddPointOutOfRangeMaxSize()
 {
     float inf = std::numeric_limits<float>::infinity();
-
     expectInvalidAddPoint(inf, 1);
     expectInvalidAddPoint(1, inf);
     expectInvalidAddPoint(inf, inf);
+
+    expectInvalidAddPoint(Graph::MAX_SIZE + 0.1f, 0);
 }
 
 static void expectPrintable(float sizeX, float sizeY, float x, float y)
@@ -141,9 +144,10 @@ static void expectPrintable(float sizeX, float sizeY, float x, float y)
 
 void Graph_test::testPrintFractionalSize()
 {
-    expectPrintable(2.4f, 2.4f, 2.3f, 2.3f);
-    expectPrintable(0.4f, 0.4f, 0.3f, 0.3f);
-    expectPrintable(2.5f, 2.5f, 2.4f, 2.4f);
-    expectPrintable(Graph::MAX_SIZE, Graph::MAX_SIZE,Graph::MAX_SIZE - 0.1f, Graph::MAX_SIZE - 0.1f);
+    expectPrintable(2.4f, 2.4f, 2.4f, 2.4f);
+    expectPrintable(0.4f, 0.4f, 0.4f, 0.4f);
+    expectPrintable(2.5f, 2.5f, 1.5f, 1.5f);
+    expectPrintable(2.5f, 2.5f, 0, 0);
+    expectPrintable(Graph::MAX_SIZE, Graph::MAX_SIZE,Graph::MAX_SIZE, Graph::MAX_SIZE);
 }
 
