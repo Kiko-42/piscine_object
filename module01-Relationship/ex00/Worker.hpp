@@ -1,23 +1,30 @@
 #ifndef WORKER_HPP
 #define WORKER_HPP
 
+#include "Tool.hpp"
+#include <vector>
+
 class Worker
 {
 public:
     Worker(): coordonnee(), stat(){};
+
 private:
-    class Position
+    struct Position
     {
         int x, y, z;
     };
-    class Statistic
+    struct Statistic
     {
         int level;
-        int exp; //Positionのx,y,zの定義と同じように１行で書くべきか？でもPositionのx,y,zは変数として三位一体感が強いが、statisticに対してのlevel, expは一体感が薄いから別で定義するほうがいいのではないかと感じた。変数定義を１行で書くべきかどうかの基準についてC++の正しい基準や考え方を知りたい
+        int exp;
     };
 
     Position coordonnee;
     Statistic stat;
+
+    //TODO: Toolのリファレンスをもたせた方がシンプルに扱えそうだと思ってTool &をvectorに持たせようとしたらエラーになった。なんでだろう.エラーメッセージ見る感じ、vectorのテンプレート的にpointerしか入れれない?
+    std::vector<Tool &> tools; 
 };
 
 #endif
