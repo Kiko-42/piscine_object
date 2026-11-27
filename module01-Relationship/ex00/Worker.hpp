@@ -23,8 +23,7 @@ private:
     Position coordonnee;
     Statistic stat;
 
-    //TODO: Toolのリファレンスをもたせた方がシンプルに扱えそうだと思ってTool &をvectorに持たせようとしたらエラーになった。なんでだろう.エラーメッセージ見る感じ、vectorのテンプレート的にpointerしか入れれない?
-    std::vector<Tool &> tools; 
+    std::vector<Tool *> tools; 
 };
 
 #endif

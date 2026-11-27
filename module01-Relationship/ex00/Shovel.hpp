@@ -2,11 +2,12 @@
 #define SHOVEL_HPP
 
 #include "Tool.hpp"
+#include <stddef.h>
 
 class Shovel: Tool
 {
 private:
-    size_t numberOfUses; //TODO: size_t使いたいとき何includeすればいいんだっけ
+    size_t numberOfUses;
 };
 
 #endif
