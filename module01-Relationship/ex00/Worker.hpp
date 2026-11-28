@@ -4,10 +4,14 @@
 #include "Tool.hpp"
 #include <vector>
 
+typedef std::vector<Tool *> Tools;
+
 class Worker
 {
 public:
     Worker(): coordonnee(), stat(){};
+
+    void giveTool(Tool *tool);
 
 private:
     struct Position
@@ -23,7 +27,7 @@ private:
     Position coordonnee;
     Statistic stat;
 
-    std::vector<Tool *> tools; 
+    Tools tools;
 };
 
 #endif
